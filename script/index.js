@@ -4,14 +4,59 @@ const loadLesson = () => {
       .then((json) => displayLesson(json.data));
 };
 
+const removeactive=()=>{
+  const lessonbtn = document.querySelectorAll(".lesson-btn");
+  lessonbtn.forEach(btn=>btn.classList.remove('active'));
+}
 // word function link setup
 const loadLevelWord=(id)=>{
   const url = `https://openapi.programming-hero.com/api/level/${id}`;
    fetch(url)
      .then((res) => res.json())
-     .then((data) => displayLevelWord(data.data));
-   
+     .then((data) => {
+      removeactive();
+      const onclick = document.getElementById(`lesson-btn-${id}`);
+      onclick.classList.add("active");
+       displayLevelWord(data.data);
+     }
+    );  
 };
+
+const LoadwordDetails=async(id)=>{
+  const url=`https://openapi.programming-hero.com/api/word/${id}`;
+  console.log(url);
+  const res=await fetch(url);
+  const details=await res.json();
+  displayWordDetails(details.data);
+
+}
+const displayWordDetails=(word)=>{
+
+  const detailsBox = document.getElementById("details-container");
+  detailsBox.innerHTML = `
+     <div id="details-container" class="">
+    <div>
+    <h1 class="font-bold" >Eager (     :ইগার)</h1>
+  </div>
+    <div>
+    <h2 class="font-bold">Meaning</h2>
+    <p class="font-bold">আগ্রহী</p>
+  </div>
+    <div>
+    <h2 class="font-bold">Example</h2>
+    <p class="font-bold">The kids were eager to open their gifts.</p>
+  </div>
+    <div>
+    <h1 class="font-bold">সমার্থক শব্দ গুলো</h1>
+    <span class="btn">Enthusiastic</span>
+    <span class="btn">excited</span>
+    <span class="btn">keen</span>
+  </div>
+   </div>
+  `;
+  document.getElementById("my_modal_5").showModal();
+}
+
 const displayLevelWord = (words) => {
   const wordContainer = document.getElementById("word-container");
  wordContainer.innerHTML = "";
@@ -36,7 +81,9 @@ const displayLevelWord = (words) => {
       <p class="font-semibold">Meaning/pronounciation</p>
       <div class="text-2xl font-bangla">${word.meaning ? word.meaning : "not find meaning"}/ ${word.pronunciation ? word.pronunciation : "not find pronunciation"}</div>
      <div class="flex justify-between items-center">
-      <button class="btn bg-[#1A91FF10] hover:bg-[#1A91FF80]"><i class="fa-solid fa-circle-info"></i></button>
+
+      <button onclick="LoadwordDetails(${word.id})"
+       class="btn bg-[#1A91FF10] hover:bg-[#1A91FF80]"><i class="fa-solid fa-circle-info"></i></button>
       <button class="btn  bg-[#1A91FF10] hover:bg-[#1A91FF80]"><i class="fa-solid fa-volume-low"></i></button>
       </div>
       </div>
@@ -56,7 +103,9 @@ wordContainer.append(card);});
 //   3-create element
 const btnDiv = document.createElement("div");
 btnDiv.innerHTML = `
-<button onclick="loadLevelWord(${lesson.level_no})" class="btn btn-outline btn-primary">
+<button id="lesson-btn-${lesson.level_no}" 
+onclick="loadLevelWord(${lesson.level_no})"
+class="btn btn-outline btn-primary lesson-btn">
  <i class="fa-solid fa-book-open"></i>Lesson -${lesson.level_no}
  </button>
   `;
@@ -65,3 +114,4 @@ btnDiv.innerHTML = `
 }
 };
 loadLesson();
+//id="lesson-btn-${lesson.level_no}
