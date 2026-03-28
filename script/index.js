@@ -1,3 +1,11 @@
+
+const createElements = (arr) => {
+  const htmlElements = arr.map((el) => `<span class="btn">${el}</span>`);
+  return(htmlElements.join(" "));
+};
+
+
+
 const loadLesson = () => {
     fetch("https://openapi.programming-hero.com/api/levels/all")
       .then((res) => res.json())
@@ -22,39 +30,36 @@ const loadLevelWord=(id)=>{
     );  
 };
 
-const LoadwordDetails=async(id)=>{
-  const url=`https://openapi.programming-hero.com/api/word/${id}`;
-  console.log(url);
+const loadWordDetail=async(id)=>{
+  const url = `https://openapi.programming-hero.com/api/word/${id}`;
   const res=await fetch(url);
   const details=await res.json();
   displayWordDetails(details.data);
-
 }
-const displayWordDetails=(word)=>{
 
-  const detailsBox = document.getElementById("details-container");
-  detailsBox.innerHTML = `
-     <div id="details-container" class="">
-    <div>
-    <h1 class="font-bold" >Eager (     :ইগার)</h1>
-  </div>
-    <div>
-    <h2 class="font-bold">Meaning</h2>
-    <p class="font-bold">আগ্রহী</p>
-  </div>
-    <div>
-    <h2 class="font-bold">Example</h2>
-    <p class="font-bold">The kids were eager to open their gifts.</p>
-  </div>
-    <div>
-    <h1 class="font-bold">সমার্থক শব্দ গুলো</h1>
-    <span class="btn">Enthusiastic</span>
-    <span class="btn">excited</span>
-    <span class="btn">keen</span>
-  </div>
-   </div>
-  `;
-  document.getElementById("my_modal_5").showModal();
+const displayWordDetails=(word)=>{
+const detailsBox = document.getElementById("details-container");
+detailsBox.innerHTML = `
+ <div class="">
+      <h2 class="text-2xl font-bold">
+        ${word.word} (  <i class="fa-solid fa-microphone-lines"></i>   :${word.pronunciation})
+      </h2>
+    </div>
+    <div class="">
+      <h2 class=" font-bold">meaning </h2>
+      <p>${word.meaning}</p>
+    </div>
+    <div class="">
+      <h2 class=" font-bold">Example</h2>
+      <p>${word.sentence}</p>
+      <p></p>
+    </div>
+    <div class="">
+      <h2 class=" font-bold">সমার্থক শব্দ গুলো</h2>
+     <div>${createElements(word.synonyms)}</div>
+    </div>
+`;
+ document.getElementById("word_modal").showModal();
 }
 
 const displayLevelWord = (words) => {
@@ -82,8 +87,9 @@ const displayLevelWord = (words) => {
       <div class="text-2xl font-bangla">${word.meaning ? word.meaning : "not find meaning"}/ ${word.pronunciation ? word.pronunciation : "not find pronunciation"}</div>
      <div class="flex justify-between items-center">
 
-      <button onclick="LoadwordDetails(${word.id})"
+      <button onclick="loadWordDetail(${word.id})"
        class="btn bg-[#1A91FF10] hover:bg-[#1A91FF80]"><i class="fa-solid fa-circle-info"></i></button>
+
       <button class="btn  bg-[#1A91FF10] hover:bg-[#1A91FF80]"><i class="fa-solid fa-volume-low"></i></button>
       </div>
       </div>
