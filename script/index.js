@@ -4,6 +4,22 @@ const createElements = (arr) => {
   return(htmlElements.join(" "));
 };
 
+function pronounceWord(word) {
+  const utterance = new SpeechSynthesisUtterance(word);
+  utterance.lang = "en-EN"; // English
+  window.speechSynthesis.speak(utterance);
+}
+
+const manageSpinner=(status)=>{
+  if(status==true){
+    document.getElementById("spinner").classList.remove("hidden");
+    document.getElementById("word-container").classList.add("hidden");
+  }
+  else{
+       document.getElementById("spinner").classList.add("hidden");
+       document.getElementById("word-container").classList.remove("hidden");
+  }
+}
 
 
 const loadLesson = () => {
@@ -16,8 +32,11 @@ const removeactive=()=>{
   const lessonbtn = document.querySelectorAll(".lesson-btn");
   lessonbtn.forEach(btn=>btn.classList.remove('active'));
 }
+
+
 // word function link setup
-const loadLevelWord=(id)=>{
+  const loadLevelWord=(id)=>{
+    manageSpinner(true);
   const url = `https://openapi.programming-hero.com/api/level/${id}`;
    fetch(url)
      .then((res) => res.json())
@@ -74,6 +93,8 @@ const displayLevelWord = (words) => {
         <p class="text-[#79716B]">এই Lesson এ এখনো কোন Vocabulary যুক্ত করা হয়নি।</p>
         <h1 class="font-medium text-[#292524] text-2xl">নেক্সট Lesson এ যান</h1>
       </div>`;
+      manageSpinner(false);
+      return;
  }
 
   words.forEach((word) => { //every object show this function
@@ -90,12 +111,13 @@ const displayLevelWord = (words) => {
       <button onclick="loadWordDetail(${word.id})"
        class="btn bg-[#1A91FF10] hover:bg-[#1A91FF80]"><i class="fa-solid fa-circle-info"></i></button>
 
-      <button class="btn  bg-[#1A91FF10] hover:bg-[#1A91FF80]"><i class="fa-solid fa-volume-low"></i></button>
+      <button onclick="pronounceWord('${word.word}')" class="btn  bg-[#1A91FF10] hover:bg-[#1A91FF80]"><i class="fa-solid fa-volume-low"></i></button>
       </div>
       </div>
  `;
 //join div and word container this code
-wordContainer.append(card);});            
+wordContainer.append(card);});
+manageSpinner(false);            
 };
 
 
@@ -121,3 +143,18 @@ class="btn btn-outline btn-primary lesson-btn">
 };
 loadLesson();
 //id="lesson-btn-${lesson.level_no}
+document.getElementById("btn-search").addEventListener("click",()=>{
+  removeactive();
+  const input = document.getElementById("input-search");
+  const searchValue = input.value.trim().toLowerCase();
+
+  fetch("https://openapi.programming-hero.com/api/words/all")
+    .then((res) => res.json())
+    .then((data) => {
+      const allword = data.data;
+      const filterwords = allword.filter((word) =>
+        word.word.toLowerCase().includes(searchValue),
+      );
+       displayLevelWord(filterwords);
+    });
+});
